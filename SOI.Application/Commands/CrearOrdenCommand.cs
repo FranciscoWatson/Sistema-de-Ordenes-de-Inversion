@@ -1,6 +1,9 @@
-﻿namespace SOI.Application.DTOs;
+﻿using MediatR;
+using SOI.Application.DTOs;
 
-public class CrearOrdenDto
+namespace SOI.Application.Commands;
+
+public class CrearOrdenCommand : IRequest<OrdenResponseDto>
 {
     public int CuentaId { get; set; }   
     public int ActivoId { get; set; }

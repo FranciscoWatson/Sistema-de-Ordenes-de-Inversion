@@ -20,7 +20,9 @@ public class ActivoRepository : IActivoRepository
 
     public async Task<Activo?> GetByIdAsync(int id)
     {
-        return await _context.Activos.FindAsync(id);
+        return await _context.Activos
+            .Include(a => a.TipoActivo)
+            .FirstOrDefaultAsync(a => a.ActivoId == id);
     }
 
     public async Task<Activo> CreateAsync(Activo activo)

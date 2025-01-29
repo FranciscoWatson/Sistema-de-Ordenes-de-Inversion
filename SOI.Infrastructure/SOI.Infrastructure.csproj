@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\SOI.Application\SOI.Application.csproj" />
       <ProjectReference Include="..\SOI.Domain\SOI.Domain.csproj" />
     </ItemGroup>
 

@@ -1,0 +1,11 @@
+﻿using SOI.Domain.Entities;
+namespace SOI.Application.Interfaces.Repositories;
+
+public interface IOrdenRepository
+{
+    public Task<List<Orden>> GetAllAsync();
+    public Task<Orden> GetByIdAsync(int id);
+    public Task<Orden> CreateAsync(Orden orden);
+    public Task UpdateAsync(Orden orden);
+    public Task DeleteAsync(Orden orden);
+}

@@ -25,6 +25,7 @@ public static class PersistenceConfiguration
     {
         services.AddScoped<IOrdenRepository, OrdenRepository>();
         services.AddScoped<IActivoRepository, ActivoRepository>();
+        services.AddScoped<ICuentaRepository, CuentaRepository>();
         return services;
     }
 }

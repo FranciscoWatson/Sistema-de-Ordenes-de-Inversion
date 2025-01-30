@@ -34,4 +34,11 @@ public class OrdenController : ControllerBase
         var result = await _mediator.Send(new ObtenerOrdenesQuery());
         return Ok(result);
     }
+    
+    [HttpGet("{id}")]
+    public async Task<IActionResult> ObtenerOrdenPorId(int id)
+    {
+        var result = await _mediator.Send(new ObtenerOrdenPorIdQuery { CuentaId = id });
+        return Ok(result);
+    }
 }

@@ -8,6 +8,11 @@ public class OrdenRepository : IOrdenRepository
 {
     private readonly SoiDbContext _context;
     
+    public OrdenRepository(SoiDbContext context)
+    {
+        _context = context;
+    }
+    
     public async Task<List<Orden>> GetAllAsync()
     {
         return await _context.Ordenes.ToListAsync();

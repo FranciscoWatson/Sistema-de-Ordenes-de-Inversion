@@ -8,6 +8,11 @@ public class CuentaRepository : ICuentaRepository
 {
     private readonly SoiDbContext _context;
     
+    public CuentaRepository(SoiDbContext context)
+    {
+        _context = context;
+    }
+    
     public async Task<List<Cuenta>> GetAllAsync()
     {
         return await _context.Cuentas.ToListAsync();

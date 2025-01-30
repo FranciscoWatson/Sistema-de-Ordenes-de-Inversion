@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SOI.Application.Commands;
 using SOI.Application.DTOs;
+using SOI.Application.Queries;
 
 namespace SOI.API.Controllers;
 
@@ -24,6 +25,13 @@ public class OrdenController : ControllerBase
     {
         var command = _mapper.Map<CrearOrdenCommand>(request);
         var result = await _mediator.Send(command);
+        return Ok(result);
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> ObtenerOrdenes()
+    {
+        var result = await _mediator.Send(new ObtenerOrdenesQuery());
         return Ok(result);
     }
 }

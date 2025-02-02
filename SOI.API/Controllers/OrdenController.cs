@@ -50,4 +50,11 @@ public class OrdenController : ControllerBase
         var result = await _mediator.Send(command);
         return Ok(result);
     }
+    
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> EliminarOrden(int id)
+    {
+        await _mediator.Send(new EliminarOrderCommand { OrdenId = id });
+        return Ok();
+    }
 }

@@ -41,4 +41,14 @@ public class OrdenController : ControllerBase
         var result = await _mediator.Send(new ObtenerOrdenPorIdQuery { CuentaId = id });
         return Ok(result);
     }
+    
+    // To-DO: Validar dependiendo el tipo de activo que tiene que enviar.
+    [HttpPut("{id}")]
+    public async Task<IActionResult> ActualizarOrden(int id, [FromBody] ActualizarOrdenDto request)
+    {
+        var command = _mapper.Map<ActualizarOrdenCommand>(request);
+        command.OrdenId = id;
+        var result = await _mediator.Send(command);
+        return Ok(result);
+    }
 }

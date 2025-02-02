@@ -1,8 +1,9 @@
-﻿using SOI.Domain.Entities;
+﻿using SOI.Domain.Authentication.Models;
+using SOI.Domain.Entities;
 
 namespace SOI.Domain.Authentication;
 
 public interface IJwtTokenGenerator
 {
-    string GenerateToken(Cuenta cuenta);
+    TokenInfo GenerateToken(Cuenta cuenta);
 }

@@ -13,7 +13,8 @@ public static class AuthenticationConfiguration
         configuration.GetSection("JwtAuthentication").Bind(jwtConfig);
         
         services.AddSingleton(jwtConfig);
-        
+
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

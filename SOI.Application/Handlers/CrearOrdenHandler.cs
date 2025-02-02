@@ -4,6 +4,7 @@ using SOI.Application.Commands;
 using SOI.Application.DTOs;
 using SOI.Application.Interfaces.Repositories;
 using SOI.Domain.Entities;
+using SOI.Domain.Services;
 
 namespace SOI.Application.Handlers;
 
@@ -13,13 +14,15 @@ public class CrearOrdenHandler : IRequestHandler<CrearOrdenCommand, OrdenRespons
     private readonly IActivoRepository _activoRepository;
     private readonly ICuentaRepository _cuentaRepository;
     private readonly IMapper _mapper;
+    private readonly IOrdenDomainService _ordenDomainService;
     
-    public CrearOrdenHandler(IOrdenRepository ordenRepository, IActivoRepository activoRepository, ICuentaRepository cuentaRepository, IMapper mapper)
+    public CrearOrdenHandler(IOrdenRepository ordenRepository, IActivoRepository activoRepository, ICuentaRepository cuentaRepository, IMapper mapper, IOrdenDomainService ordenDomainService)
     {
         _ordenRepository = ordenRepository;
         _activoRepository = activoRepository;
         _cuentaRepository = cuentaRepository;
         _mapper = mapper;
+        _ordenDomainService = ordenDomainService;
     }
     
     public async Task<OrdenResponseDto> Handle(CrearOrdenCommand request, CancellationToken cancellationToken)
@@ -36,13 +39,14 @@ public class CrearOrdenHandler : IRequestHandler<CrearOrdenCommand, OrdenRespons
             throw new Exception("Cuenta no encontrada");
         }
         
-        if (activo.TipoActivoId == 1 && request.Precio != null)
-            throw new ArgumentException("El precio no debe ser ingresado para Acciones.");
+        _ordenDomainService.Validar(activo.TipoActivoId, request.Precio);
 
-        if ((activo.TipoActivoId == 2 || activo.TipoActivoId == 3) && request.Precio == null)
-            throw new ArgumentException("El precio es obligatorio para Bonos y FCI.");
-        
-        decimal montoTotal = CalcularMontoTotal(request, activo);
+        var montoTotal = _ordenDomainService.CalcularMontoTotal(
+            activo.TipoActivoId,
+            activo.PrecioUnitario,
+            request.Precio,
+            request.Cantidad
+        );
         
         var orden = new Orden
         {
@@ -57,30 +61,5 @@ public class CrearOrdenHandler : IRequestHandler<CrearOrdenCommand, OrdenRespons
         var result = await _ordenRepository.CreateAsync(orden);
         
         return _mapper.Map<OrdenResponseDto>(result);
-    }
-
-    private decimal CalcularMontoTotal(CrearOrdenCommand request, Activo activo)
-    {
-        decimal montoTotal = 0;
-        switch (activo.TipoActivoId)
-        {
-            case 1: // Acción
-                montoTotal = activo.PrecioUnitario * request.Cantidad;
-                decimal comision = montoTotal * 0.006m;
-                decimal impuestos = comision * 0.21m;
-                return montoTotal + comision + impuestos;
-
-            case 2: // Bono
-                montoTotal = (decimal)(request.Precio * request.Cantidad)!;
-                comision = montoTotal * 0.002m;
-                impuestos = comision * 0.21m;
-                return montoTotal + comision + impuestos;
-
-            case 3: // FCI
-                return (decimal)(request.Precio * request.Cantidad)!;
-
-            default:
-                throw new ArgumentException("Tipo de activo desconocido.");
-        }
     }
 }

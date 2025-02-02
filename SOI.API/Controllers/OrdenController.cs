@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SOI.Application.Commands;
 using SOI.Application.DTOs;
+using SOI.Application.Queries;
 
 namespace SOI.API.Controllers;
 
@@ -25,5 +26,35 @@ public class OrdenController : ControllerBase
         var command = _mapper.Map<CrearOrdenCommand>(request);
         var result = await _mediator.Send(command);
         return Ok(result);
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> ObtenerOrdenes()
+    {
+        var result = await _mediator.Send(new ObtenerOrdenesQuery());
+        return Ok(result);
+    }
+    
+    [HttpGet("{id}")]
+    public async Task<IActionResult> ObtenerOrdenPorId(int id)
+    {
+        var result = await _mediator.Send(new ObtenerOrdenPorIdQuery { CuentaId = id });
+        return Ok(result);
+    }
+    
+    [HttpPut("{id}")]
+    public async Task<IActionResult> ActualizarOrden(int id, [FromBody] ActualizarOrdenDto request)
+    {
+        var command = _mapper.Map<ActualizarOrdenCommand>(request);
+        command.OrdenId = id;
+        var result = await _mediator.Send(command);
+        return Ok(result);
+    }
+    
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> EliminarOrden(int id)
+    {
+        await _mediator.Send(new EliminarOrderCommand { OrdenId = id });
+        return Ok();
     }
 }

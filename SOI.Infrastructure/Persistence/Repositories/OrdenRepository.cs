@@ -30,10 +30,11 @@ public class OrdenRepository : IOrdenRepository
         return orden;
     }
 
-    public async Task UpdateAsync(Orden orden)
+    public async Task<Orden> UpdateAsync(Orden orden)
     {
         _context.Ordenes.Update(orden);
         await _context.SaveChangesAsync();
+        return orden;
     }
 
     public async Task DeleteAsync(int id)

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SOI.Application.Commands;
 using SOI.Application.DTOs;
@@ -9,6 +10,7 @@ namespace SOI.API.Controllers;
 
 [ApiController]
 [Route("api/ordenes")]
+[Authorize]
 public class OrdenController : ControllerBase
 {
     private readonly IMediator _mediator;

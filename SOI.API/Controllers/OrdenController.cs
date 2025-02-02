@@ -42,7 +42,6 @@ public class OrdenController : ControllerBase
         return Ok(result);
     }
     
-    // To-DO: Validar dependiendo el tipo de activo que tiene que enviar.
     [HttpPut("{id}")]
     public async Task<IActionResult> ActualizarOrden(int id, [FromBody] ActualizarOrdenDto request)
     {

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using MediatR;
 using SOI.Application.Commands;
 using SOI.Application.DTOs;
@@ -14,18 +15,24 @@ public class ActualizarOrdenHandler : IRequestHandler<ActualizarOrdenCommand, Or
     private readonly ICuentaRepository _cuentaRepository;
     private readonly IMapper _mapper;
     private readonly IOrdenDomainService _ordenDomainService;
+    private readonly IValidator<ActualizarOrdenCommand> _validator;
     
-    public ActualizarOrdenHandler(IOrdenRepository ordenRepository, IActivoRepository activoRepository, ICuentaRepository cuentaRepository, IMapper mapper, IOrdenDomainService ordenDomainService)
+    public ActualizarOrdenHandler(IOrdenRepository ordenRepository, IActivoRepository activoRepository, ICuentaRepository cuentaRepository, IMapper mapper, IOrdenDomainService ordenDomainService, IValidator<ActualizarOrdenCommand> validator)
     {
         _ordenRepository = ordenRepository;
         _activoRepository = activoRepository;
         _cuentaRepository = cuentaRepository;
         _mapper = mapper;
         _ordenDomainService = ordenDomainService;
+        _validator = validator;
     }
     
     public async Task<OrdenResponseDto> Handle(ActualizarOrdenCommand request, CancellationToken cancellationToken)
     {
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+        if (!validationResult.IsValid)
+            throw new ValidationException(validationResult.Errors);
+        
         var orden = await _ordenRepository.GetByIdAsync(request.OrdenId);
         if (orden == null)
             throw new Exception("La orden no existe.");

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using MediatR;
 using SOI.Application.Commands;
 using SOI.Application.DTOs;
@@ -15,18 +16,25 @@ public class CrearOrdenHandler : IRequestHandler<CrearOrdenCommand, OrdenRespons
     private readonly ICuentaRepository _cuentaRepository;
     private readonly IMapper _mapper;
     private readonly IOrdenDomainService _ordenDomainService;
+    private readonly IValidator<CrearOrdenCommand> _validator;
     
-    public CrearOrdenHandler(IOrdenRepository ordenRepository, IActivoRepository activoRepository, ICuentaRepository cuentaRepository, IMapper mapper, IOrdenDomainService ordenDomainService)
+    public CrearOrdenHandler(IOrdenRepository ordenRepository, IActivoRepository activoRepository, ICuentaRepository cuentaRepository, IMapper mapper, IOrdenDomainService ordenDomainService, IValidator<CrearOrdenCommand> validator)
     {
         _ordenRepository = ordenRepository;
         _activoRepository = activoRepository;
         _cuentaRepository = cuentaRepository;
         _mapper = mapper;
         _ordenDomainService = ordenDomainService;
+        _validator = validator;
     }
     
     public async Task<OrdenResponseDto> Handle(CrearOrdenCommand request, CancellationToken cancellationToken)
     {
+        
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+        if (!validationResult.IsValid)
+            throw new ValidationException(validationResult.Errors);
+        
         var activo = await _activoRepository.GetByIdAsync(request.ActivoId);
         if (activo == null)
         {

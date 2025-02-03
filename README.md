@@ -17,7 +17,8 @@ Este proyecto es una **API REST** para gestionar órdenes de inversión. Impleme
 5. [Configuraciones Principales](#configuraciones-principales)  
    - [Variables de Entorno](#variables-de-entorno)  
    - [JWT](#jwt)  
-   - [Entity Framework](#entity-framework)  
+   - [Entity Framework](#entity-framework)
+   - [Diagrama de Base de Datos](#Diagrama-de-Base-de-Datos)
 6. [Endpoints Principales](#endpoints-principales)  
    - [Autenticación](#autenticación)  
    - [Ordenes](#ordenes)  
@@ -152,6 +153,12 @@ Ejemplo de Token JWT:
 ```
 
 Para generar los tokens, se usa la clave secreta definida en `JwtAuthentication__SecretKey`.
+
+### Diagrama de Base de Datos
+
+A continuación, se muestra el diagrama de la base de datos utilizada en el sistema:
+
+![Diagrama de Base de Datos](./DiagramaBD.jpg)
 
 ### Entity Framework
 

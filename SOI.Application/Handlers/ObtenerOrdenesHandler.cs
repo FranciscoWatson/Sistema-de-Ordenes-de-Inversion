@@ -19,7 +19,7 @@
         
         public async Task<List<OrdenResponseDto>> Handle(ObtenerOrdenesQuery request, CancellationToken cancellationToken)
         {
-            var ordenes = await _ordenRepository.GetAllAsync();
+            var ordenes = await _ordenRepository.GetAllByCuentaAsync(request.CuentaId);
             return _mapper.Map<List<OrdenResponseDto>>(ordenes);
         }
     }

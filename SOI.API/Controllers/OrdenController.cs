@@ -1,5 +1,7 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SOI.Application.Commands;
 using SOI.Application.DTOs;
@@ -9,6 +11,7 @@ namespace SOI.API.Controllers;
 
 [ApiController]
 [Route("api/ordenes")]
+[Authorize]
 public class OrdenController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -31,20 +34,36 @@ public class OrdenController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> ObtenerOrdenes()
     {
-        var result = await _mediator.Send(new ObtenerOrdenesQuery());
+        var cuentaIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(cuentaIdClaim) || !int.TryParse(cuentaIdClaim, out int cuentaId))
+            return Unauthorized("Usuario no autenticado o ID inválido.");
+        
+        var result = await _mediator.Send(new ObtenerOrdenesQuery { CuentaId = cuentaId });
         return Ok(result);
     }
     
     [HttpGet("{id}")]
     public async Task<IActionResult> ObtenerOrdenPorId(int id)
     {
-        var result = await _mediator.Send(new ObtenerOrdenPorIdQuery { CuentaId = id });
+        var cuentaIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(cuentaIdClaim) || !int.TryParse(cuentaIdClaim, out int cuentaId))
+            return Unauthorized("Usuario no autenticado o ID inválido.");
+        var result = await _mediator.Send(new ObtenerOrdenPorIdQuery { OrderId = id, CuentaId = cuentaId });
         return Ok(result);
     }
     
     [HttpPut("{id}")]
     public async Task<IActionResult> ActualizarOrden(int id, [FromBody] ActualizarOrdenDto request)
     {
+        var cuentaIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(cuentaIdClaim) || !int.TryParse(cuentaIdClaim, out int cuentaId))
+            return Unauthorized("Usuario no autenticado o ID inválido.");
+        
+        if (cuentaId != request.CuentaId)
+            return Unauthorized("No tienes permiso para actualizar esta orden.");
+        
         var command = _mapper.Map<ActualizarOrdenCommand>(request);
         command.OrdenId = id;
         var result = await _mediator.Send(command);
@@ -54,7 +73,11 @@ public class OrdenController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> EliminarOrden(int id)
     {
-        await _mediator.Send(new EliminarOrderCommand { OrdenId = id });
+        var cuentaIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(cuentaIdClaim) || !int.TryParse(cuentaIdClaim, out int cuentaId))
+            return Unauthorized("Usuario no autenticado o ID inválido.");
+        
+        await _mediator.Send(new EliminarOrderCommand { OrdenId = id, CuentaId = cuentaId });
         return Ok();
     }
 }

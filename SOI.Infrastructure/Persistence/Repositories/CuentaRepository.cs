@@ -42,4 +42,10 @@ public class CuentaRepository : ICuentaRepository
         _context.Cuentas.Remove(cuenta);
         await _context.SaveChangesAsync();
     }
+    
+    public async Task<Cuenta?> AuthenticateAsync(string nombre, string password)
+    {
+        return await _context.Cuentas
+            .FirstOrDefaultAsync(c => c.Nombre == nombre && c.Password == password);
+    }
 }

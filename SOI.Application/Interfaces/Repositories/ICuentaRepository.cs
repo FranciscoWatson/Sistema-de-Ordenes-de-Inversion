@@ -9,4 +9,5 @@ public interface ICuentaRepository
     public Task<Cuenta> CreateAsync(Cuenta cuenta);
     public Task UpdateAsync(Cuenta cuenta);
     public Task DeleteAsync(int cuenta);
+    Task<Cuenta?> AuthenticateAsync(string nombre, string password);
 }

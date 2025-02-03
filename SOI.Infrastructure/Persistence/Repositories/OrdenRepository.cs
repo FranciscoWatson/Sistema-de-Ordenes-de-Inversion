@@ -43,4 +43,9 @@ public class OrdenRepository : IOrdenRepository
         _context.Ordenes.Remove(orden);
         await _context.SaveChangesAsync();
     }
+    
+    public async Task<List<Orden>> GetAllByCuentaAsync(int cuentaId)
+    {
+        return await _context.Ordenes.Where(o => o.Cuenta.CuentaId == cuentaId).ToListAsync();
+    }
 }

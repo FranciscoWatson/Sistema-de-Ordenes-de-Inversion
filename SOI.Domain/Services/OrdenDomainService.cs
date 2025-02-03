@@ -11,7 +11,7 @@ public class OrdenDomainService : IOrdenDomainService
             throw new ArgumentException("El precio es obligatorio para Bonos y FCI.");
     }
 
-    public decimal CalcularMontoTotal(int tipoActivoId, decimal precioActivoBD, decimal? precioRequest, decimal cantidad)
+    public decimal CalcularMontoTotal(int tipoActivoId, decimal precioActivoBD, decimal? precioRequest, int cantidad)
     {
         switch (tipoActivoId)
         {

@@ -15,6 +15,10 @@ public class EliminarOrderHandler : IRequestHandler<EliminarOrderCommand>
 
     public async Task Handle(EliminarOrderCommand request, CancellationToken cancellationToken)
     {
+        var order = await _ordenRepository.GetByIdAsync(request.OrdenId);
+        if (order == null || order.CuentaId != request.CuentaId)
+            throw new UnauthorizedAccessException("No tienes permiso para eliminar esta orden.");
+        
         await _ordenRepository.DeleteAsync(request.OrdenId);
     }
 }

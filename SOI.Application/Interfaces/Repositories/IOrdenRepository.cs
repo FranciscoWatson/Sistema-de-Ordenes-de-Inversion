@@ -8,4 +8,5 @@ public interface IOrdenRepository
     public Task<Orden> CreateAsync(Orden orden);
     public Task<Orden> UpdateAsync(Orden orden);
     public Task DeleteAsync(int orden);
+    public Task<List<Orden>> GetAllByCuentaAsync(int cuentaId);
 }

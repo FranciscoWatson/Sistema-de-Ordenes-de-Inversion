@@ -19,7 +19,11 @@ public class ObtenerOrdenPorIdHandler : IRequestHandler<ObtenerOrdenPorIdQuery, 
     
     public async Task<OrdenResponseDto> Handle(ObtenerOrdenPorIdQuery request, CancellationToken cancellationToken)
     {
-        var orden = await _ordenRepository.GetByIdAsync(request.CuentaId);
+        var orden = await _ordenRepository.GetByIdAsync(request.OrderId);
+        
+        if (orden == null || orden.CuentaId != request.CuentaId)
+            throw new UnauthorizedAccessException("No tienes permiso para acceder a esta orden.");
+        
         return _mapper.Map<OrdenResponseDto>(orden);
     }
 }

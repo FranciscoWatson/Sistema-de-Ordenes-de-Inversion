@@ -11,7 +11,7 @@ public class OrdenProfile : Profile
     {
         CreateMap<Orden, OrdenResponseDto>().ReverseMap();
         CreateMap<CrearOrdenDto, CrearOrdenCommand>().ReverseMap();
-        
+        CreateMap<ActualizarOrdenDto, ActualizarOrdenCommand>().ReverseMap();
     }
     
 }

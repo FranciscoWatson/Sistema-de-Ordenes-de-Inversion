@@ -1,0 +1,23 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /app
+
+COPY ["SOI.API/SOI.API.csproj", "SOI.API/"]
+COPY ["SOI.Infrastructure/SOI.Infrastructure.csproj", "SOI.Infrastructure/"]
+COPY ["SOI.Application/SOI.Application.csproj", "SOI.Application/"]
+COPY ["SOI.Domain/SOI.Domain.csproj", "SOI.Domain/"]
+
+RUN dotnet restore "SOI.API/SOI.API.csproj"
+
+COPY . .
+RUN dotnet publish "SOI.API/SOI.API.csproj" -c Release -o /publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+COPY --from=build /publish .
+
+# --== (A) Dile a ASP.NET que escuche en 80 ==--
+ENV ASPNETCORE_URLS=http://+:80
+EXPOSE 80
+
+ENTRYPOINT ["dotnet", "SOI.API.dll"]

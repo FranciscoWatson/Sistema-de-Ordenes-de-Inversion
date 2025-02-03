@@ -8,6 +8,11 @@ public class CuentaRepository : ICuentaRepository
 {
     private readonly SoiDbContext _context;
     
+    public CuentaRepository(SoiDbContext context)
+    {
+        _context = context;
+    }
+    
     public async Task<List<Cuenta>> GetAllAsync()
     {
         return await _context.Cuentas.ToListAsync();
@@ -36,5 +41,11 @@ public class CuentaRepository : ICuentaRepository
         var cuenta = await _context.Cuentas.FindAsync(id);
         _context.Cuentas.Remove(cuenta);
         await _context.SaveChangesAsync();
+    }
+    
+    public async Task<Cuenta?> AuthenticateAsync(string nombre, string password)
+    {
+        return await _context.Cuentas
+            .FirstOrDefaultAsync(c => c.Nombre == nombre && c.Password == password);
     }
 }

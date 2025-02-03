@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using SOI.Application.Interfaces.Repositories;
+using SOI.Domain.Services;
 using SOI.Infrastructure.Persistence.Repositories;
 
 
@@ -17,6 +18,10 @@ public static class PersistenceConfiguration
         });
         
         services.AddRepositories();
+        
+        services.AddInfrastructureServices();
+        
+        
 
         return services;
     }
@@ -26,6 +31,12 @@ public static class PersistenceConfiguration
         services.AddScoped<IOrdenRepository, OrdenRepository>();
         services.AddScoped<IActivoRepository, ActivoRepository>();
         services.AddScoped<ICuentaRepository, CuentaRepository>();
+        return services;
+    }
+    
+    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
+    {
+        services.AddScoped<IOrdenDomainService, OrdenDomainService>();
         return services;
     }
 }

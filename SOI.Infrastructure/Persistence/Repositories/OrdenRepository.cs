@@ -8,6 +8,11 @@ public class OrdenRepository : IOrdenRepository
 {
     private readonly SoiDbContext _context;
     
+    public OrdenRepository(SoiDbContext context)
+    {
+        _context = context;
+    }
+    
     public async Task<List<Orden>> GetAllAsync()
     {
         return await _context.Ordenes.ToListAsync();
@@ -25,10 +30,11 @@ public class OrdenRepository : IOrdenRepository
         return orden;
     }
 
-    public async Task UpdateAsync(Orden orden)
+    public async Task<Orden> UpdateAsync(Orden orden)
     {
         _context.Ordenes.Update(orden);
         await _context.SaveChangesAsync();
+        return orden;
     }
 
     public async Task DeleteAsync(int id)
@@ -36,5 +42,10 @@ public class OrdenRepository : IOrdenRepository
         var orden = await _context.Ordenes.FindAsync(id);
         _context.Ordenes.Remove(orden);
         await _context.SaveChangesAsync();
+    }
+    
+    public async Task<List<Orden>> GetAllByCuentaAsync(int cuentaId)
+    {
+        return await _context.Ordenes.Where(o => o.Cuenta.CuentaId == cuentaId).ToListAsync();
     }
 }

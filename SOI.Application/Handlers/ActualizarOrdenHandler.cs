@@ -4,21 +4,20 @@ using MediatR;
 using SOI.Application.Commands;
 using SOI.Application.DTOs;
 using SOI.Application.Interfaces.Repositories;
-using SOI.Domain.Entities;
 using SOI.Domain.Services;
 
 namespace SOI.Application.Handlers;
 
-public class CrearOrdenHandler : IRequestHandler<CrearOrdenCommand, OrdenResponseDto>
+public class ActualizarOrdenHandler : IRequestHandler<ActualizarOrdenCommand, OrdenResponseDto>
 {
     private readonly IOrdenRepository _ordenRepository;
     private readonly IActivoRepository _activoRepository;
     private readonly ICuentaRepository _cuentaRepository;
     private readonly IMapper _mapper;
     private readonly IOrdenDomainService _ordenDomainService;
-    private readonly IValidator<CrearOrdenCommand> _validator;
+    private readonly IValidator<ActualizarOrdenCommand> _validator;
     
-    public CrearOrdenHandler(IOrdenRepository ordenRepository, IActivoRepository activoRepository, ICuentaRepository cuentaRepository, IMapper mapper, IOrdenDomainService ordenDomainService, IValidator<CrearOrdenCommand> validator)
+    public ActualizarOrdenHandler(IOrdenRepository ordenRepository, IActivoRepository activoRepository, ICuentaRepository cuentaRepository, IMapper mapper, IOrdenDomainService ordenDomainService, IValidator<ActualizarOrdenCommand> validator)
     {
         _ordenRepository = ordenRepository;
         _activoRepository = activoRepository;
@@ -28,25 +27,24 @@ public class CrearOrdenHandler : IRequestHandler<CrearOrdenCommand, OrdenRespons
         _validator = validator;
     }
     
-    public async Task<OrdenResponseDto> Handle(CrearOrdenCommand request, CancellationToken cancellationToken)
+    public async Task<OrdenResponseDto> Handle(ActualizarOrdenCommand request, CancellationToken cancellationToken)
     {
-        
         var validationResult = await _validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
         
+        var orden = await _ordenRepository.GetByIdAsync(request.OrdenId);
+        if (orden == null)
+            throw new Exception("La orden no existe.");
+
         var activo = await _activoRepository.GetByIdAsync(request.ActivoId);
         if (activo == null)
-        {
-            throw new Exception("Activo no encontrado");
-        }
-        
+            throw new Exception("Activo no encontrado.");
+
         var cuenta = await _cuentaRepository.GetByIdAsync(request.CuentaId);
         if (cuenta == null)
-        {
-            throw new Exception("Cuenta no encontrada");
-        }
-        
+            throw new Exception("Cuenta no encontrada.");
+
         _ordenDomainService.Validar(activo.TipoActivoId, request.Precio);
 
         var montoTotal = _ordenDomainService.CalcularMontoTotal(
@@ -56,18 +54,14 @@ public class CrearOrdenHandler : IRequestHandler<CrearOrdenCommand, OrdenRespons
             request.Cantidad
         );
         
-        var orden = new Orden
-        {
-            CuentaId = request.CuentaId,
-            ActivoId = request.ActivoId,
-            Cantidad = request.Cantidad,
-            Precio = request.Precio,
-            Operacion = request.Operacion,
-            MontoTotal = montoTotal
-        };
-        
-        var result = await _ordenRepository.CreateAsync(orden);
-        
+        orden.CuentaId = request.CuentaId;
+        orden.ActivoId = request.ActivoId;
+        orden.Cantidad = request.Cantidad;
+        orden.Precio = request.Precio;
+        orden.Operacion = request.Operacion;
+        orden.MontoTotal = montoTotal;
+
+        var result = await _ordenRepository.UpdateAsync(orden);
         return _mapper.Map<OrdenResponseDto>(result);
     }
 }

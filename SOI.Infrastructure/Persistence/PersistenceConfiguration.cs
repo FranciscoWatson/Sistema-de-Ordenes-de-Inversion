@@ -20,6 +20,8 @@ public static class PersistenceConfiguration
         services.AddRepositories();
         
         services.AddInfrastructureServices();
+        
+        
 
         return services;
     }

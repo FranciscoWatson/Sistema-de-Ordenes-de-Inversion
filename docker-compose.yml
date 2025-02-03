@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  soiapi:
+    build:
+      context: .
+      dockerfile: SOI.API/Dockerfile
+    container_name: soiapi
+    ports:
+      - "5000:80"  # host:contenedor
+    environment:
+      # Cambia la cadena a tu gusto: IP o DNS del SQL externo
+      ConnectionStrings__SqlServerConnection: "Server=host.docker.internal,1433;Database=SoiDB;User Id=sa;Password=sa;TrustServerCertificate=True;"
+      ASPNETCORE_ENVIRONMENT: "Development"
+      JwtAuthentication__SecretKey: "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
+      JwtAuthentication__Issuer: "http://localhost:5297"
+      JwtAuthentication__Audience: "soiapi"
+      JwtAuthentication__TokenExpiryInMinutes: "60"
